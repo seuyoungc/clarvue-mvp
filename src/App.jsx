@@ -437,8 +437,8 @@ function MealModal({ meal, onClose }) {
 function PhoneMockup({ children }) {
   return (
     <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: '#111111' }}
+      className="flex min-h-screen items-center justify-center py-10"
+      style={{ backgroundColor: '#0D1F17' }}
     >
       {/* Outer shell — the "frame" */}
       <div
@@ -446,7 +446,7 @@ function PhoneMockup({ children }) {
           width: 414,
           height: 868,
           borderRadius: 54,
-          backgroundColor: '#1c1c1e',
+          backgroundColor: '#162d20',
           padding: 12,
           boxShadow:
             '0 40px 100px rgba(0,0,0,0.9), 0 8px 32px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.07)',
@@ -546,7 +546,7 @@ export default function App() {
           <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', padding: '4px 10px', borderRadius: 999, backgroundColor: '#222', color: '#888', marginBottom: 16, display: 'inline-block' }}>
             Getting Started
           </span>
-          <h1 className="text-4xl font-bold tracking-widest text-white mb-3">CLARVUE</h1>
+          <h1 className="text-4xl font-bold tracking-widest text-white mb-3" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>CLARVUE</h1>
           <p className="text-sm tracking-wide mb-12" style={{ color: '#E8E8E8' }}>
             Your cycle. Pre-engineered.
           </p>
@@ -554,7 +554,7 @@ export default function App() {
             onSubmit={handleSubmit}
             className="flex flex-col items-center gap-5 w-full max-w-xs"
           >
-            <label className="text-sm tracking-wide text-center" style={{ color: '#E8E8E8' }}>
+            <label className="text-base font-semibold tracking-wide text-center text-white">
               When does your next period start?
             </label>
             <input
@@ -595,7 +595,7 @@ export default function App() {
         {/* Content region — no scroll */}
         <div style={{ flex: 1, overflow: 'hidden', padding: '14px 20px 4px', boxSizing: 'border-box' }}>
           <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <h1 className="text-xl font-bold tracking-widest text-white">CLARVUE</h1>
+            <h1 className="text-xl font-bold tracking-widest text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>CLARVUE</h1>
             <span
               style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', padding: '4px 10px', borderRadius: 999, backgroundColor: '#1a3d2e', color: '#2D6A4F' }}
             >
@@ -683,7 +683,7 @@ export default function App() {
           <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', padding: '4px 10px', borderRadius: 999, backgroundColor: '#1e1e1e', color: '#555', marginBottom: 20, display: 'inline-block' }}>
             Window Inactive
           </span>
-          <h1 className="text-2xl font-bold tracking-widest mb-12" style={{ color: '#2D6A4F' }}>
+          <h1 className="text-2xl font-bold tracking-widest mb-12" style={{ color: '#2D6A4F', fontFamily: "'Space Grotesk', sans-serif" }}>
             CLARVUE
           </h1>
           <p className="text-5xl font-bold text-white text-center leading-tight mb-6">
@@ -709,7 +709,7 @@ export default function App() {
 
   if (isMobile) {
     return (
-      <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', backgroundColor: '#0a0a0a' }}>
+      <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', backgroundColor: '#0D1F17' }}>
         {content}
       </div>
     )
