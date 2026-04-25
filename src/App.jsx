@@ -606,7 +606,7 @@ export default function App() {
 
           {/* Tagline — body typography */}
           <p style={{ fontFamily: dm, fontSize: 14, fontWeight: 400, color: 'rgba(232, 237, 228, 0.75)', letterSpacing: 0, marginBottom: 36, textAlign: 'center', lineHeight: 1.6 }}>
-            Clarity before the disruption.
+            Decisions handled. Before you need them.
           </p>
 
           {/* Input card — glassmorphism on gradient */}
@@ -728,13 +728,10 @@ export default function App() {
             </span>
           </header>
 
-          <main style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <main style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
             {/* Day counter section */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <p style={{ fontFamily: dm, fontSize: 13, color: C.sageCircuit, letterSpacing: '0.01em', margin: 0 }}>
-                You're in your luteal phase.
-              </p>
 
               {/* Data readout — DAY N OF 7, enlarged */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -744,18 +741,21 @@ export default function App() {
               </div>
 
               {/* Contextual intelligence line */}
-              <p style={{ fontFamily: dm, fontSize: 11, color: C.sageCircuit, letterSpacing: '0.01em', margin: 0, lineHeight: 1.4 }}>
+              <p style={{ fontFamily: dm, fontSize: 13, fontWeight: 500, color: C.forestSignal, letterSpacing: '0.01em', margin: '4px 0 0', lineHeight: 1.5, opacity: 0.78 }}>
                 {contextLine}
               </p>
 
-              <div style={{ marginTop: 24 }}>
+              <div style={{ marginTop: 32 }}>
                 <WeekStrip periodDateStr={periodDate} daysUntil={daysUntil} />
               </div>
             </div>
 
             {/* Meal section */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <FeatureLabel color={C.signalGreen}>Today's Pick</FeatureLabel>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <p style={{ fontFamily: dm, fontSize: 15, fontWeight: 500, color: C.forestSignal, letterSpacing: '0.005em', margin: '0 0 4px', lineHeight: 1.4, opacity: 0.9 }}>
+                Window active. Decisions handled.
+              </p>
+              <FeatureLabel color={C.signalGreen}>Today's Meal</FeatureLabel>
 
               {/* Meal card — silver left accent (brand signal), light glass */}
               <div
