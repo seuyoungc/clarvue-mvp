@@ -591,6 +591,12 @@ export default function App() {
 
   const { screen, day, daysUntil } = getScreen(periodDate)
 
+  // Today as YYYY-MM-DD in the user's local timezone — used as the date input's min
+  const todayStr = (() => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })()
+
   // ── Onboarding ──────────────────────────────────────────────────────────────
   let content
 
@@ -635,6 +641,7 @@ export default function App() {
                   className="date-input-light"
                   value={inputDate}
                   onChange={e => setInputDate(e.target.value)}
+                  min={todayStr}
                   required
                   style={{
                     width: '100%', borderRadius: 10, padding: '12px 44px 12px 16px',
