@@ -649,16 +649,18 @@ export default function App() {
                     backgroundColor: 'rgba(255, 255, 255, 0.08)',
                     border: '1.5px solid rgba(232, 237, 228, 0.2)',
                     outline: 'none',
-                    colorScheme: 'dark',
+                    WebkitAppearance: 'none',
+                    appearance: 'none',
                     transition: 'border-color 200ms ease',
                   }}
                   onFocus={e => e.currentTarget.style.borderColor = 'rgba(232, 237, 228, 0.55)'}
                   onBlur={e => e.currentTarget.style.borderColor = 'rgba(232, 237, 228, 0.2)'}
                 />
-                {/* Custom calendar icon — clicks programmatically open the native picker */}
+                {/* Custom calendar icon — clicks programmatically open the native picker. Hidden on mobile (iOS shows its own). */}
                 <svg
                   aria-label="Open date picker"
                   role="button"
+                  className="date-icon-overlay"
                   xmlns="http://www.w3.org/2000/svg"
                   width="16" height="16" viewBox="0 0 24 24"
                   fill="none" stroke={C.silverMist} strokeWidth="2"
@@ -718,8 +720,8 @@ export default function App() {
       <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
         <MealModal meal={openRecipe} onClose={() => setOpenRecipe(null)} />
 
-        {/* Content — light theme, no scroll */}
-        <div style={{ flex: 1, overflow: 'hidden', padding: '14px 20px 4px' }}>
+        {/* Content — light theme, scrollable on mobile when content exceeds viewport */}
+        <div style={{ flex: 1, overflow: 'auto', WebkitOverflowScrolling: 'touch', padding: '14px 20px 20px' }}>
 
           {/* Header — logo (light) + status chip */}
           <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
