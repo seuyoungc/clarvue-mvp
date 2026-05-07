@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+(function (m, a, z, e) {
+  var s, t, u, v;
+  try {
+    t = m.sessionStorage.getItem('maze-us');
+  } catch (err) {}
+
+  if (!t) {
+    t = new Date().getTime();
+    try {
+      m.sessionStorage.setItem('maze-us', t);
+    } catch (err) {}
+  }
+
+  u = document.currentScript || (function () {
+    var w = document.getElementsByTagName('script');
+    return w[w.length - 1];
+  })();
+  v = u && u.nonce;
+
+  s = a.createElement('script');
+  s.src = z + '?apiKey=' + e;
+  s.async = true;
+  if (v) s.setAttribute('nonce', v);
+  a.getElementsByTagName('head')[0].appendChild(s);
+  m.mazeUniversalSnippetApiKey = e;
+})(window, document, 'https://snippet.maze.co/maze-universal-loader.js', 'c34368da-7a3b-45e5-aee6-87d3c53527a3');
+</script>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/clarvue-mvp/test/assets/logo-CH-h8NaV.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3D7A3D" />
+    <title>CLARVUE</title>
+    <meta name="description" content="A cycle companion that makes one nutrition decision and one action suggestion for women — every day of their luteal phase." />
+    <meta property="og:title" content="CLARVUE" />
+    <meta property="og:description" content="A cycle companion that makes one nutrition decision and one action suggestion for women — every day of their luteal phase." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/clarvue-mvp/test/assets/index-GBJkCRbs.js"></script>
+    <link rel="stylesheet" crossorigin href="/clarvue-mvp/test/assets/index-K0PAVqAZ.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
