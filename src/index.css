@@ -12,16 +12,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.6);
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-.date-input-light::-webkit-calendar-picker-indicator {
-  display: none;
-}
-
 * {
   box-sizing: border-box;
+}
+
+.dp-day:not(:disabled):not([data-selected="true"]):hover {
+  background-color: rgba(232, 237, 228, 0.08);
 }

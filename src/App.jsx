@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import logoMark from './assets/logo.svg'
 import fullLogoDark from './assets/full-logo-dark.svg'
 
@@ -22,6 +22,12 @@ const C = {
 const grotesk = "'Space Grotesk', sans-serif"
 const mono    = "'Space Mono', monospace"
 const dm      = "'Manrope', sans-serif"
+
+// Date utilities — used by DatePicker and onboarding helpers
+const fmtDateISO = (d) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
 // ── Content ───────────────────────────────────────────────────────────────────
 const MEALS = [
@@ -532,6 +538,174 @@ function MealModal({ meal, onClose }) {
   )
 }
 
+// ── DatePicker ────────────────────────────────────────────────────────────────
+// In-house calendar. Same component on desktop and mobile (no native picker).
+// Greys out dates outside [min, max] and previous/next month spillovers.
+// Props: value (YYYY-MM-DD or ''), onChange (str => void), min/max (YYYY-MM-DD).
+function DatePicker({ value, onChange, min, max }) {
+  const todayStr = fmtDateISO(new Date())
+
+  const initialMonth = (() => {
+    const seed = value || min || todayStr
+    const [y, m] = seed.split('-').map(Number)
+    return { year: y, month: m - 1 }
+  })()
+  const [viewMonth, setViewMonth] = useState(initialMonth)
+
+  const goPrev = () => setViewMonth(({ year, month }) =>
+    month === 0 ? { year: year - 1, month: 11 } : { year, month: month - 1 }
+  )
+  const goNext = () => setViewMonth(({ year, month }) =>
+    month === 11 ? { year: year + 1, month: 0 } : { year, month: month + 1 }
+  )
+
+  const cells = []
+  const firstOfMonth = new Date(viewMonth.year, viewMonth.month, 1)
+  const startDow = firstOfMonth.getDay()
+  const daysInMonth = new Date(viewMonth.year, viewMonth.month + 1, 0).getDate()
+
+  for (let i = startDow - 1; i >= 0; i--) {
+    const date = new Date(viewMonth.year, viewMonth.month, -i)
+    cells.push({ date, day: date.getDate(), inMonth: false })
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ date: new Date(viewMonth.year, viewMonth.month, d), day: d, inMonth: true })
+  }
+  let nextSpill = 1
+  while (cells.length < 42) {
+    cells.push({
+      date: new Date(viewMonth.year, viewMonth.month + 1, nextSpill),
+      day: nextSpill,
+      inMonth: false,
+    })
+    nextSpill++
+  }
+
+  const isInRange = (str) => {
+    if (min && str < min) return false
+    if (max && str > max) return false
+    return true
+  }
+
+  const monthStartStr = `${viewMonth.year}-${String(viewMonth.month + 1).padStart(2, '0')}-01`
+  const monthEndStr = fmtDateISO(new Date(viewMonth.year, viewMonth.month + 1, 0))
+  const prevDisabled = !!min && monthStartStr <= min
+  const nextDisabled = !!max && monthEndStr >= max
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {/* Header — month name + chevrons */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
+        <button
+          type="button" onClick={goPrev} disabled={prevDisabled} aria-label="Previous month"
+          style={{
+            background: 'none', border: 'none', padding: 6,
+            color: 'rgba(232, 237, 228, 0.85)',
+            opacity: prevDisabled ? 0.2 : 1,
+            cursor: prevDisabled ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'opacity 200ms ease',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+
+        <div style={{
+          fontFamily: dm, fontSize: 13, fontWeight: 600,
+          color: 'rgba(232, 237, 228, 0.9)', letterSpacing: '0.01em',
+        }}>
+          {MONTH_NAMES[viewMonth.month]} {viewMonth.year}
+        </div>
+
+        <button
+          type="button" onClick={goNext} disabled={nextDisabled} aria-label="Next month"
+          style={{
+            background: 'none', border: 'none', padding: 6,
+            color: 'rgba(232, 237, 228, 0.85)',
+            opacity: nextDisabled ? 0.2 : 1,
+            cursor: nextDisabled ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'opacity 200ms ease',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Day-of-week labels */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center' }}>
+        {['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d => (
+          <div key={d} style={{
+            fontFamily: grotesk, fontSize: 9, fontWeight: 600,
+            color: 'rgba(232, 237, 228, 0.45)',
+            letterSpacing: '0.14em',
+            paddingBottom: 6,
+          }}>
+            {d}
+          </div>
+        ))}
+      </div>
+
+      {/* Day grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
+        {cells.map((cell, i) => {
+          const dateStr = fmtDateISO(cell.date)
+          const inRange = isInRange(dateStr)
+          const disabled = !cell.inMonth || !inRange
+          const selected = dateStr === value
+          const isToday = dateStr === todayStr
+
+          const ariaLabel = cell.date.toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+          })
+
+          return (
+            <button
+              key={i}
+              type="button"
+              className="dp-day"
+              onClick={() => !disabled && onChange(dateStr)}
+              disabled={disabled}
+              aria-label={ariaLabel}
+              aria-pressed={selected}
+              data-selected={selected ? 'true' : 'false'}
+              style={{
+                fontFamily: mono, fontSize: 14, fontWeight: 500,
+                color: selected ? C.textPrimary : 'rgba(232, 237, 228, 0.85)',
+                backgroundColor: selected ? C.signalGreen : 'transparent',
+                border: 'none',
+                aspectRatio: '1 / 1',
+                borderRadius: 8,
+                cursor: disabled ? 'default' : 'pointer',
+                opacity: disabled ? 0.18 : 1,
+                padding: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                position: 'relative',
+                transition: 'background-color 150ms ease',
+                outline: 'none',
+              }}
+            >
+              {cell.day}
+              {isToday && !selected && !disabled && (
+                <span style={{
+                  position: 'absolute', bottom: 4, left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 3, height: 3, borderRadius: '50%',
+                  backgroundColor: C.signalGreen,
+                }} />
+              )}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── PhoneMockup ───────────────────────────────────────────────────────────────
 function PhoneMockup({ children, screenBg = C.bgBase }) {
   const scale = usePhoneScale()
@@ -594,7 +768,6 @@ function PhoneMockup({ children, screenBg = C.bgBase }) {
 export default function App() {
   const [periodDate, setPeriodDate] = useState('')
   const [inputDate, setInputDate] = useState('')
-  const dateInputRef = useRef(null)
   const [openRecipe, setOpenRecipe] = useState(null)
   const isMobile = useIsMobile()
 
@@ -649,73 +822,31 @@ export default function App() {
             borderRadius: 16,
             padding: '20px',
           }}>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <label
-                htmlFor="period-date"
-                style={{ fontFamily: dm, fontSize: 14, fontWeight: 500, color: 'rgba(232, 237, 228, 0.85)', textAlign: 'center', letterSpacing: 0 }}
-              >
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <h2 style={{ fontFamily: dm, fontSize: 17, fontWeight: 600, color: C.textPrimary, textAlign: 'center', letterSpacing: 0, lineHeight: 1.35, margin: '2px 0 0' }}>
                 When does your next period start?
-              </label>
-              {/* Wrapper hides native icon; our SVG sits on top, clicks pass through */}
-              <div style={{ position: 'relative' }}>
-                <input
-                  ref={dateInputRef}
-                  id="period-date"
-                  type="date"
-                  className="date-input-light"
-                  value={inputDate}
-                  onChange={e => setInputDate(e.target.value)}
-                  min={todayStr}
-                  required
-                  style={{
-                    width: '100%', borderRadius: 10, padding: '12px 44px 12px 16px',
-                    fontFamily: mono, fontSize: 14, color: C.textPrimary,
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    border: '1.5px solid rgba(232, 237, 228, 0.2)',
-                    outline: 'none',
-                    WebkitAppearance: 'none',
-                    appearance: 'none',
-                    transition: 'border-color 200ms ease',
-                  }}
-                  onFocus={e => e.currentTarget.style.borderColor = 'rgba(232, 237, 228, 0.55)'}
-                  onBlur={e => e.currentTarget.style.borderColor = 'rgba(232, 237, 228, 0.2)'}
-                />
-                {/* Custom calendar icon — clicks programmatically open the native picker. Hidden on mobile (iOS shows its own). */}
-                <svg
-                  aria-label="Open date picker"
-                  role="button"
-                  className="date-icon-overlay"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16" height="16" viewBox="0 0 24 24"
-                  fill="none" stroke={C.silverMist} strokeWidth="2"
-                  strokeLinecap="round" strokeLinejoin="round"
-                  onClick={() => dateInputRef.current?.showPicker()}
-                  style={{
-                    position: 'absolute', right: 14, top: '50%',
-                    transform: 'translateY(-50%)',
-                    cursor: 'pointer',
-                    opacity: 0.85,
-                  }}
-                >
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                  <line x1="16" y1="2" x2="16" y2="6" />
-                  <line x1="8" y1="2" x2="8" y2="6" />
-                  <line x1="3" y1="10" x2="21" y2="10" />
-                </svg>
-              </div>
+              </h2>
+              <DatePicker
+                value={inputDate}
+                onChange={setInputDate}
+                min={todayStr}
+              />
               <button
                 type="submit"
+                disabled={!inputDate}
                 style={{
                   width: '100%', borderRadius: 12, padding: '14px',
                   minHeight: 48,
                   fontFamily: grotesk, fontSize: 13, fontWeight: 700,
                   letterSpacing: '0.12em', color: C.textPrimary,
                   backgroundColor: C.signalGreen,
-                  border: 'none', cursor: 'pointer',
+                  border: 'none',
+                  cursor: !inputDate ? 'default' : 'pointer',
+                  opacity: !inputDate ? 0.4 : 1,
                   transition: 'opacity 200ms ease',
                 }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                onMouseEnter={e => { if (inputDate) e.currentTarget.style.opacity = '0.85' }}
+                onMouseLeave={e => { if (inputDate) e.currentTarget.style.opacity = '1' }}
               >
                 SET DATE
               </button>
@@ -783,11 +914,13 @@ export default function App() {
               </div>
             </div>
 
+            {/* Section-bridging directive — anchors hierarchy after the DAY counter */}
+            <h2 style={{ fontFamily: dm, fontSize: 19, fontWeight: 700, color: C.forestSignal, letterSpacing: '-0.005em', margin: '4px 0 -4px', lineHeight: 1.3 }}>
+              Window active. Decisions handled.
+            </h2>
+
             {/* Meal section */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <p style={{ fontFamily: dm, fontSize: 15, fontWeight: 500, color: C.forestSignal, letterSpacing: '0.005em', margin: '0 0 4px', lineHeight: 1.4, opacity: 0.9 }}>
-                Window active. Decisions handled.
-              </p>
               <FeatureLabel color={C.signalGreen}>Today's Meal</FeatureLabel>
 
               {/* Meal card — silver left accent (brand signal), light glass */}
