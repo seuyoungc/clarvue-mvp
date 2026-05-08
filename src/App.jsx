@@ -233,6 +233,25 @@ function useIsMobile() {
   return isMobile
 }
 
+// Scale the phone mockup so it always fits the viewport height.
+// Phone's natural size is 414×868. Heightscale clamps prevent extreme sizes.
+function computePhoneScale(viewportH) {
+  const heightScale = (viewportH - 60) / 868
+  return Math.max(0.7, Math.min(1.15, heightScale))
+}
+
+function usePhoneScale() {
+  const [scale, setScale] = useState(
+    () => typeof window !== 'undefined' ? computePhoneScale(window.innerHeight) : 1
+  )
+  useEffect(() => {
+    const onResize = () => setScale(computePhoneScale(window.innerHeight))
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return scale
+}
+
 // ── Utility Components ────────────────────────────────────────────────────────
 
 // LogoLockup — mark + wordmark. dim=true for dormant, light=true for light bg.
@@ -515,19 +534,23 @@ function MealModal({ meal, onClose }) {
 
 // ── PhoneMockup ───────────────────────────────────────────────────────────────
 function PhoneMockup({ children, screenBg = C.bgBase }) {
+  const scale = usePhoneScale()
   return (
     <div
       className="flex min-h-screen items-center justify-center py-10"
       style={{ backgroundColor: '#E8EDE4' }}
     >
-      {/* Phone frame — Forest Signal green, part of the brand */}
+      {/* Bounding box matches scaled size so flex centering still works */}
+      <div style={{ width: 414 * scale, height: 868 * scale, flexShrink: 0 }}>
+      {/* Phone frame — Forest Signal green, part of the brand. Scaled to fit viewport. */}
       <div style={{
         width: 414, height: 868,
         borderRadius: 54,
         backgroundColor: C.forestSignal,
         padding: 12,
         boxShadow: '0 48px 120px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(200, 212, 192, 0.05)',
-        flexShrink: 0,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
       }}>
         {/* Inner bezel */}
         <div style={{
@@ -561,6 +584,7 @@ function PhoneMockup({ children, screenBg = C.bgBase }) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
