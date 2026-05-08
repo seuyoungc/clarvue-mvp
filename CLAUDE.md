@@ -15,6 +15,23 @@
 
 ---
 
+## Workflow Rules
+
+**Do not streamline shipping after code changes.** After editing files, stop and let the user preview the change first. Wait for an explicit instruction ("commit", "push", "deploy", or similar) before running any of:
+
+- `git add`, `git commit`, `git push`
+- `npm run deploy`
+- `gh-pages` invocations
+- Any other action that publishes code beyond the local working tree
+
+The user previews changes by running `npm run dev` in Cursor before approving them for live. Chaining edit → commit → push → deploy in one shot bypasses that review step.
+
+If the user gives a single-shot instruction that clearly includes the deploy ("push this fix to live", "deploy the date picker change"), that counts as explicit permission. Ambiguous tasks default to stopping after the edit and asking.
+
+**When the user says "commit and push" (or "commit", "push", "deploy"), commit and push *all* outstanding changes in the working tree** — not a subset, not just the most recent edit. Don't ask which files to include. Stage everything pending, commit, push, and report which files were included so the user can verify scope after the fact.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
